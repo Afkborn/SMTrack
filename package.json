@@ -1,0 +1,21 @@
+{
+  "name": "smtrack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --signal SIGINT index.js "
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.1",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1",
+    "fs": "^0.0.1-security",
+    "mongoose": "^7.6.2",
+    "node-telegram-bot-api": "^0.63.0",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7"
+  }
+}
