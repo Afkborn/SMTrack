@@ -1,11 +1,16 @@
 const TelegramBot = require("node-telegram-bot-api");
 const mongoDbConnect = require("./database/mongoDb");
 const TelegramUser = require("./model/TelegramUser");
-const { convertTime, getTimeForLog } = require("./common/time");
-const { checkUserRegistration } = require("./middleware/auth");
+const fs = require("fs");
+const { getDifferenceFromToday, getTimeForLog } = require("./common/time");
+const {
+  checkUserRegistration,
+  checkUserAndSendMessage,
+} = require("./middleware/auth");
 const { getConfig, saveConfig } = require("./config/Config");
 const { notifyUsersForNewSPKBulten } = require("./events/SPKBultenEvent");
 const path = require("path");
+const strings = require("./constants/Strings.js");
 require("dotenv").config();
 
 const token = process.env.TELEGRAM_API_KEY;
@@ -18,15 +23,9 @@ let config;
   mongoDbConnect();
 })();
 
-// //  "/echo [whatever] " will return [whatever] to the user
-// bot.onText(/\/echo (.+)/, (msg, match) => {
-//   const chatId = msg.chat.id;
-//   const resp = match[1]; // the captured "whatever"
-//   bot.sendMessage(chatId, resp);
-// });
-
 // Matches "/start"
 
+// START COMMAND
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   checkUserRegistration(bot, msg, true).then((user) => {
@@ -48,38 +47,56 @@ bot.onText(/\/start/, (msg) => {
       user
         .save()
         .then((result) => {
-          bot.sendMessage(chatId, "Başarıyla kayıt oldun.");
+          bot.sendMessage(chatId, strings.SAVE_SUCCESS);
         })
         .catch((err) => {
           console.log(err);
         });
     } else {
-      const createdAt = user.createdAt;
-
       bot.sendMessage(
         chatId,
-        `Sen zaten ${convertTime(createdAt)} tarihinden  beri tanıyorum :)`
+        strings.ALREADY_SAVED(
+          getDifferenceFromToday(user.createdAt),
+          user.username
+        )
       );
     }
   });
+});
+// Listen for the /bulten command without any parameters
+bot.onText(/\/bulten$/, (msg) => {
+  const chatId = msg.chat.id;
+  console.log(config);
+  bot.sendMessage(
+    chatId,
+    strings.LAST_BULTEN_MESSAGE(
+      config["SPK"]["last_bulten_no"],
+      config["SPK"]["last_bulten_link"]
+    ),
+    { parse_mode: "Markdown" }
+  );
+});
+
+bot.onText(/\/bulten (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const bultenNo = match[1];
+  const bultenPath = `./data/bultenler/${bultenNo}.pdf`;
+
+  if (fs.existsSync(bultenPath)) {
+    bot.sendDocument(chatId, bultenPath);
+  } else {
+    bot.sendMessage(chatId, strings.BULTEN_NOT_FOUND);
+  }
 });
 
 // Listen for any kind of message. There are different kinds of messages.
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
 
-  checkUserRegistration(bot, msg).then((user) => {
-    if (!user) {
-      bot.sendMessage(
-        chatId,
-        "Kayıtlı olmadığın için mesajlarını okuyamıyorum. /start komutu ile kayıt olabilirsin."
-      );
-      return;
-    }
-
-    // bot.sendMessage(chatId, "Received your message");
-  });
+  checkUserAndSendMessage(bot, msg, strings.NOT_AUTH);
 });
+
+bot.on("polling_error", console.log);
 
 // KAPAMA SİNYALİ
 process.on("SIGINT", function () {

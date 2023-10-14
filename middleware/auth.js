@@ -1,6 +1,6 @@
 const TelegramUser = require("../model/TelegramUser.js");
 
-async function checkUserRegistration(bot, msg, saveIfNotRegistered = false) {
+async function checkUserRegistration(bot, msg) {
   const userId = msg.from.id;
 
   try {
@@ -15,4 +15,11 @@ async function checkUserRegistration(bot, msg, saveIfNotRegistered = false) {
   }
 }
 
-module.exports = { checkUserRegistration };
+async function checkUserAndSendMessage(bot, msg, message) {
+  const user = await checkUserRegistration(bot, msg);
+  if (!user) {
+    bot.sendMessage(msg.chat.id, message);
+  }
+}
+
+module.exports = { checkUserRegistration, checkUserAndSendMessage };

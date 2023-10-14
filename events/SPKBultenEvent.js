@@ -6,6 +6,7 @@ const {
 } = require("../config/Config.js");
 const { downloadFile } = require("../common/file.js");
 const { sendMessageToAllTelegramUsers } = require("../events/TelegramEvent.js");
+const strings = require("../constants/Strings.js");
 
 const axios = require("axios");
 const cheerio = require("cheerio");
@@ -13,8 +14,6 @@ const cheerio = require("cheerio");
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // SSL sertifikası olmayan siteler için
 
 async function notifyUsersForNewSPKBulten(config, bot) {
-  
-
   const bulten_control_enabled = config["SPK"]["bulten_control_enabled"];
 
   if (bulten_control_enabled) {
@@ -51,7 +50,7 @@ async function notifyUsersForNewSPKBulten(config, bot) {
 
             if (last_bulten_no == baslik_text) {
               console.log(getTimeForLog() + "Yeni bülten yok.");
-              
+
               updateLastControlTime(config, new Date().getTime());
               return;
             } else {
@@ -59,7 +58,7 @@ async function notifyUsersForNewSPKBulten(config, bot) {
 
               sendMessageToAllTelegramUsers(
                 bot,
-                `${baslik_text} numaralı yeni bülten geldi, bültene ulaşmak için ${href}`
+                strings.NEW_BULTEN_MESSAGE(baslik_text, href)
               );
 
               downloadFile(href, `./data/bultenler/${baslik_text}.pdf`)
@@ -68,12 +67,12 @@ async function notifyUsersForNewSPKBulten(config, bot) {
                     `${getTimeForLog()}${baslik_text} numaralı bülten indirildi.`
                   );
 
-                  
                   updateLastBulten(
                     config,
                     new Date().getTime(),
                     baslik_text,
-                    icerik_text
+                    icerik_text,
+                    href
                   );
                 })
                 .catch((error) => {

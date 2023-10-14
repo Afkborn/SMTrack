@@ -25,12 +25,13 @@ async function updateLastControlTime(configData, newTime) {
   configData.SPK.last_control_time = newTime;
 }
 
-async function updateLastBulten(configData, newTime, newBultenNo, newBultenDate) {
+async function updateLastBulten(configData, newTime, newBultenNo, newBultenDate, newBultenLink) {
   // Değerleri güncelle
   
   configData.SPK.last_control_time = newTime;
   configData.SPK.last_bulten_no = newBultenNo;
   configData.SPK.last_bulten_date = newBultenDate;
+  configData.SPK.last_bulten_link = newBultenLink;
 }
 
 module.exports = {saveConfig, getConfig, updateLastControlTime, updateLastBulten };
