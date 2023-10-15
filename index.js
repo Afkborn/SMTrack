@@ -13,17 +13,15 @@ const strings = require("./constants/Strings.js");
 require("dotenv").config();
 mongoDbConnect();
 
+const bot = new Telegraf(process.env.TELEGRAM_API_KEY);
 let config;
 (async () => {
   config = await getConfig();
+  updateGlobalCtx(bot.context);
+  notifyUsersForNewSPKBulten(config);
 })();
 
-const bot = new Telegraf(process.env.TELEGRAM_API_KEY);
 
-bot.command("setGlobalContext", (ctx) => {
-  updateGlobalCtx(ctx);
-  notifyUsersForNewSPKBulten(config);
-});
 
 bot.command("kayit", (ctx) => {
   const msg = ctx.update.message;
@@ -49,53 +47,38 @@ bot.command("kayit", (ctx) => {
       ctx.reply(
         strings.ALREADY_AUTH(
           getDifferenceFromToday(user.createdAt),
-          user.username
+          user.first_name
         )
       );
     }
   });
 });
 
+bot.command("bulten", (ctx) => {
+  const msg = ctx.update.message;
+  if (msg.text.split(" ").length > 1) {
+    const bultenNo = msg.text.split(" ")[1];
+    const bultenPath = `./data/bultenler/${bultenNo}.pdf`;
+    if (fs.existsSync(bultenPath)) {
+      ctx.replyWithDocument({ source: bultenPath });
+    } else {
+      ctx.reply("Bülten bulunamadı.");
+    }
+  } else {
+    console.log(config)
+    ctx.reply(strings.LAST_BULTEN_MESSAGE(config.SPK.last_bulten_no, config.SPK.last_bulten_link));
+  }
+});
+
+
 bot.start(userRegistrationMiddleware, (ctx) => {
   ctx.reply("Welcome");
 });
-
 bot.help((ctx) => ctx.reply("Send me a sticker"));
 bot.on("sticker", (ctx) => ctx.reply("👍"));
 bot.hears("hi", (ctx) => ctx.reply("Hey there"));
 
 bot.launch();
-
-// Listen for the /bulten command without any parameters
-// bot.onText(/\/bulten$/, userRegistrationMiddleware(bot), (msg) => {
-//   const chatId = msg.chat.id;
-//   console.log(config);
-//   bot.sendMessage(
-//     chatId,
-//     strings.LAST_BULTEN_MESSAGE(
-//       config["SPK"]["last_bulten_no"],
-//       config["SPK"]["last_bulten_link"]
-//     ),
-//     { parse_mode: "Markdown" }
-//   );
-// });
-
-// bot.onText(
-//   /\/bulten (.+)/,
-//   userRegistrationMiddleware(bot),
-//   async (msg, match) => {
-//     // checkUserAndSendMessage(bot, msg, strings.NOT_AUTH);
-//     const chatId = msg.chat.id;
-//     const bultenNo = match[1];
-//     const bultenPath = `./data/bultenler/${bultenNo}.pdf`;
-
-//     if (fs.existsSync(bultenPath)) {
-//       bot.sendDocument(chatId, bultenPath);
-//     } else {
-//       bot.sendMessage(chatId, strings.BULTEN_NOT_FOUND);
-//     }
-//   }
-// );
 
 // KAPAMA SİNYALİ
 process.on("SIGINT", function () {

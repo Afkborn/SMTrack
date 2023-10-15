@@ -4,11 +4,9 @@ const TelegramUserSchema = new mongoose.Schema(
   {
     first_name: {
       type: String,
-      required: true,
     },
     username: {
       type: String,
-      required: true,
     },
     id: {
       type: Number,
