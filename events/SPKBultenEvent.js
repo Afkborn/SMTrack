@@ -13,7 +13,9 @@ const cheerio = require("cheerio");
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // SSL sertifikası olmayan siteler için
 
-async function notifyUsersForNewSPKBulten(config, bot) {
+
+async function notifyUsersForNewSPKBulten(config) {
+  
   const bulten_control_enabled = config["SPK"]["bulten_control_enabled"];
 
   if (bulten_control_enabled) {
@@ -57,7 +59,6 @@ async function notifyUsersForNewSPKBulten(config, bot) {
               console.log(getTimeForLog() + "Yeni bülten var, indiriliyor. ");
 
               sendMessageToAllTelegramUsers(
-                bot,
                 strings.NEW_BULTEN_MESSAGE(baslik_text, href)
               );
 

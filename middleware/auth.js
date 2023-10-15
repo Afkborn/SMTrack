@@ -1,25 +1,19 @@
-const TelegramUser = require("../model/TelegramUser.js");
+const { getTelegramUser } = require("../events/TelegramUserEvent.js");
+const strings = require("../constants/Strings.js");
 
-async function checkUserRegistration(bot, msg) {
-  const userId = msg.from.id;
+const userRegistrationMiddleware = (ctx, next) => {
+  const msg = ctx.update.message;
+  getTelegramUser(msg.from.id)
+    .then((user) => {
+      if (!user) {
+        ctx.reply(strings.NOT_AUTH);
+      } else {
+        next();
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
-  try {
-    const user = await TelegramUser.findOne({ id: userId });
-    if (!user) {
-      return null;
-    } else {
-      return user;
-    }
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function checkUserAndSendMessage(bot, msg, message) {
-  const user = await checkUserRegistration(bot, msg);
-  if (!user) {
-    bot.sendMessage(msg.chat.id, message);
-  }
-}
-
-module.exports = { checkUserRegistration, checkUserAndSendMessage };
+module.exports = { userRegistrationMiddleware };

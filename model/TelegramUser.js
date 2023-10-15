@@ -22,7 +22,10 @@ const TelegramUserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    
+    access_log_count: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
