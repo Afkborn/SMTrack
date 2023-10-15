@@ -14,12 +14,24 @@ async function logAccess(userID, requestType, requestContent = undefined) {
         resolve(result);
       })
       .catch((err) => {
-        s;
         reject(err);
       });
   });
 }
 
+const userAccessLogMiddleware = (requestType) => {
+  return (ctx, next) => {
+    const msg = ctx.update.message;
+    const user = ctx.user;
+    const param = msg.text.split(" ");
+    if (param.length > 1) {
+      const requestContent = param.slice(1).join(" ");
+      logAccess(user._id, requestType, requestContent);
+    } else {
+      logAccess(user._id, requestType);
+    }
+    next();
+  };
+};
 
-
-module.exports = { logAccess };
+module.exports = { userAccessLogMiddleware, logAccess };

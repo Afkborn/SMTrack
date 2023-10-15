@@ -8,6 +8,7 @@ const userRegistrationMiddleware = (ctx, next) => {
       if (!user) {
         ctx.reply(strings.NOT_AUTH);
       } else {
+        ctx.user = user // ctx nesnesine kullanıcıyı ekledik.
         next();
       }
     })
@@ -15,5 +16,6 @@ const userRegistrationMiddleware = (ctx, next) => {
       console.log(error);
     });
 };
+
 
 module.exports = { userRegistrationMiddleware };

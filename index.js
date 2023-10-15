@@ -5,11 +5,13 @@ const fs = require("fs");
 const { getDifferenceFromToday, getTimeForLog } = require("./common/time");
 const { updateGlobalCtx } = require("./events/TelegramEvent");
 const { userRegistrationMiddleware } = require("./middleware/auth");
+const { userAccessLogMiddleware } = require("./middleware/log");
 const { getConfig, saveConfig } = require("./config/Config");
 const { notifyUsersForNewSPKBulten } = require("./events/SPKBultenEvent");
 const { getTelegramUser } = require("./events/TelegramUserEvent");
 const path = require("path");
 const strings = require("./constants/Strings.js");
+const requestType = require("./constants/RequestTypes.js");
 require("dotenv").config();
 mongoDbConnect();
 
@@ -20,8 +22,6 @@ let config;
   updateGlobalCtx(bot.context);
   notifyUsersForNewSPKBulten(config);
 })();
-
-
 
 bot.command("kayit", (ctx) => {
   const msg = ctx.update.message;
@@ -54,26 +54,39 @@ bot.command("kayit", (ctx) => {
   });
 });
 
-bot.command("bulten", (ctx) => {
-  const msg = ctx.update.message;
-  if (msg.text.split(" ").length > 1) {
-    const bultenNo = msg.text.split(" ")[1];
-    const bultenPath = `./data/bultenler/${bultenNo}.pdf`;
-    if (fs.existsSync(bultenPath)) {
-      ctx.replyWithDocument({ source: bultenPath });
+bot.command(
+  "bulten",
+  userRegistrationMiddleware,
+  userAccessLogMiddleware(requestType.REQTYP_BULTEN),
+  (ctx) => {
+    const msg = ctx.update.message;
+    if (msg.text.split(" ").length > 1) {
+      const bultenNo = msg.text.split(" ")[1];
+      const bultenPath = `./data/bultenler/${bultenNo}.pdf`;
+      if (fs.existsSync(bultenPath)) {
+        ctx.replyWithDocument({ source: bultenPath });
+      } else {
+        ctx.reply("Bülten bulunamadı.");
+      }
     } else {
-      ctx.reply("Bülten bulunamadı.");
+      ctx.reply(
+        strings.LAST_BULTEN_MESSAGE(
+          config.SPK.last_bulten_no,
+          config.SPK.last_bulten_link
+        ),
+        { parse_mode: "Markdown" }
+      );
     }
-  } else {
-    console.log(config)
-    ctx.reply(strings.LAST_BULTEN_MESSAGE(config.SPK.last_bulten_no, config.SPK.last_bulten_link));
   }
-});
+);
 
+bot.start(
+  userRegistrationMiddleware,
+  (ctx) => {
+    ctx.reply("Welcome");
+  }
+);
 
-bot.start(userRegistrationMiddleware, (ctx) => {
-  ctx.reply("Welcome");
-});
 bot.help((ctx) => ctx.reply("Send me a sticker"));
 bot.on("sticker", (ctx) => ctx.reply("👍"));
 bot.hears("hi", (ctx) => ctx.reply("Hey there"));
