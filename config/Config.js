@@ -20,12 +20,12 @@ async function getConfig() {
   return configData;
 }
 
-async function updateLastControlTime(configData, newTime) {
+async function SPK_updateLastControlTime(configData, newTime) {
   // Değerleri güncelle
   configData.SPK.last_control_time = newTime;
 }
 
-async function updateLastBulten(configData, newTime, newBultenNo, newBultenDate, newBultenLink) {
+async function SPK_updateLastBulten(configData, newTime, newBultenNo, newBultenDate, newBultenLink) {
   // Değerleri güncelle
   
   configData.SPK.last_control_time = newTime;
@@ -34,4 +34,15 @@ async function updateLastBulten(configData, newTime, newBultenNo, newBultenDate,
   configData.SPK.last_bulten_link = newBultenLink;
 }
 
-module.exports = {saveConfig, getConfig, updateLastControlTime, updateLastBulten };
+async function CURRENCY_updateLastControlTime(configData, newTime) {
+  // Değerleri güncelle
+  configData.CURRENCY.last_control_time = newTime;
+}
+
+
+async function BIST_updateLastControlTime(configData, newTime) {
+  // Değerleri güncelle
+  configData.BIST.last_control_time = newTime;
+}
+
+module.exports = {saveConfig, getConfig, SPK_updateLastControlTime, SPK_updateLastBulten, CURRENCY_updateLastControlTime, BIST_updateLastControlTime };

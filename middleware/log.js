@@ -23,13 +23,19 @@ const userAccessLogMiddleware = (requestType) => {
   return (ctx, next) => {
     const msg = ctx.update.message;
     const user = ctx.user;
-    const param = msg.text.split(" ");
-    if (param.length > 1) {
-      const requestContent = param.slice(1).join(" ");
-      logAccess(user._id, requestType, requestContent);
+
+    if (msg.text.startsWith("/")) {
+      const param = msg.text.split(" ");
+      if (param.length > 1) {
+        const requestContent = param.slice(1).join(" ");
+        logAccess(user._id, requestType, requestContent);
+      } else {
+        logAccess(user._id, requestType);
+      }
     } else {
-      logAccess(user._id, requestType);
+      logAccess(user._id, requestType, msg.text);
     }
+
     next();
   };
 };

@@ -1,4 +1,5 @@
 const { Telegraf } = require("telegraf");
+const { message } = require("telegraf/filters");
 const mongoDbConnect = require("./database/mongoDb");
 const TelegramUser = require("./model/TelegramUser");
 const fs = require("fs");
@@ -8,6 +9,8 @@ const { userRegistrationMiddleware } = require("./middleware/auth");
 const { userAccessLogMiddleware } = require("./middleware/log");
 const { getConfig, saveConfig } = require("./config/Config");
 const { notifyUsersForNewSPKBulten } = require("./events/SPKBultenEvent");
+const { syncCurrencyData } = require("./events/CurrencyEvent");
+const { syncBISTData } = require("./events/BISTEvent");
 const { getTelegramUser } = require("./events/TelegramUserEvent");
 const path = require("path");
 const strings = require("./constants/Strings.js");
@@ -21,6 +24,8 @@ let config;
   config = await getConfig();
   updateGlobalCtx(bot.context);
   notifyUsersForNewSPKBulten(config);
+  syncCurrencyData(config);
+  syncBISTData(config);
 })();
 
 bot.command("kayit", (ctx) => {
@@ -80,16 +85,9 @@ bot.command(
   }
 );
 
-bot.start(
-  userRegistrationMiddleware,
-  (ctx) => {
-    ctx.reply("Welcome");
-  }
-);
-
-bot.help((ctx) => ctx.reply("Send me a sticker"));
-bot.on("sticker", (ctx) => ctx.reply("👍"));
-bot.hears("hi", (ctx) => ctx.reply("Hey there"));
+bot.on(message('text'), userRegistrationMiddleware, userAccessLogMiddleware(requestType.REQTYP_MESSAGE),  (ctx) => {
+  // console.log(ctx.update.message.text);
+})
 
 bot.launch();
 

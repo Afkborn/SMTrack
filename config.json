@@ -1,12 +1,24 @@
 {
   "SPK": {
-    "bulten_time_control_interval": 1000,
+    "control_enabled": 1,
+    "time_control_interval": 10000,
+    "control_interval": 900000,
     "bulten_url": "https://spk.gov.tr/spk-bultenleri/2023-yili-spk-bultenleri",
-    "bulten_control_enabled": 1,
-    "bulten_control_interval": 900000,
     "last_bulten_no": "2023-61",
     "last_bulten_date": "12 Ekim 2023 Perşembe",
-    "last_bulten_link": "https://spk.gov.tr/data/652828a58f95db2f541fb172/61-2023.pdf",
-    "last_control_time": 1697383962311
+    "last_control_time": 1697394773620,
+    "last_bulten_link": "https://spk.gov.tr/data/652828a58f95db2f541fb172/61-2023.pdf"
+  },
+  "CURRENCY": {
+    "control_enabled": 1,
+    "time_control_interval": 10000,
+    "control_interval": 900000,
+    "last_control_time": 1697394067959
+  },
+  "BIST": {
+    "control_enabled": 1,
+    "time_control_interval": 10000,
+    "control_interval": 900000,
+    "last_control_time": 1697394804874
   }
 }

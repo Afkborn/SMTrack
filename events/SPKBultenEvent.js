@@ -1,8 +1,7 @@
 const { getTimeForLog } = require("../common/time.js");
 const {
-  getConfig,
-  updateLastControlTime,
-  updateLastBulten,
+  SPK_updateLastControlTime,
+  SPK_updateLastBulten,
 } = require("../config/Config.js");
 const { downloadFile } = require("../common/file.js");
 const { sendMessageToAllTelegramUsers } = require("../events/TelegramEvent.js");
@@ -10,27 +9,25 @@ const strings = require("../constants/Strings.js");
 
 const axios = require("axios");
 const cheerio = require("cheerio");
-
+let KEY = "SPK";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // SSL sertifikası olmayan siteler için
 
-
 async function notifyUsersForNewSPKBulten(config) {
-  
-  const bulten_control_enabled = config["SPK"]["bulten_control_enabled"];
+  const bulten_control_enabled = config[KEY]["control_enabled"];
 
   if (bulten_control_enabled) {
     const bulten_time_control_interval =
-      config["SPK"]["bulten_time_control_interval"];
+      config[KEY]["time_control_interval"];
 
     setInterval(() => {
-      let last_control_time = config["SPK"]["last_control_time"];
-      let bulten_control_interval = config["SPK"]["bulten_control_interval"];
+      let last_control_time = config[KEY]["last_control_time"];
+      let bulten_control_interval = config[KEY]["control_interval"];
       let current_time_UNIX = new Date().getTime();
       if (current_time_UNIX > bulten_control_interval + last_control_time) {
         console.log(getTimeForLog() + "Bülten kontrolü geldi.");
-        let last_bulten_no = config["SPK"]["last_bulten_no"];
+        let last_bulten_no = config[KEY]["last_bulten_no"];
         axios
-          .get(config["SPK"]["bulten_url"])
+          .get(config[KEY]["bulten_url"])
           .then((response) => {
             const $ = cheerio.load(response.data);
             const bultenListDiv = $(".liste");
@@ -53,7 +50,7 @@ async function notifyUsersForNewSPKBulten(config) {
             if (last_bulten_no == baslik_text) {
               console.log(getTimeForLog() + "Yeni bülten yok.");
 
-              updateLastControlTime(config, new Date().getTime());
+              SPK_updateLastControlTime(config, new Date().getTime());
               return;
             } else {
               console.log(getTimeForLog() + "Yeni bülten var, indiriliyor. ");
@@ -68,7 +65,7 @@ async function notifyUsersForNewSPKBulten(config) {
                     `${getTimeForLog()}${baslik_text} numaralı bülten indirildi.`
                   );
 
-                  updateLastBulten(
+                  SPK_updateLastBulten(
                     config,
                     new Date().getTime(),
                     baslik_text,
