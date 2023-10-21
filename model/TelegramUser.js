@@ -11,6 +11,7 @@ const TelegramUserSchema = new mongoose.Schema(
     id: {
       type: Number,
       required: true,
+      unique: true,
     },
     is_bot: {
       type: Boolean,

@@ -11,6 +11,7 @@ const { getConfig, saveConfig } = require("./config/Config");
 const { notifyUsersForNewSPKBulten } = require("./events/SPKBultenEvent");
 const { syncCurrencyData } = require("./events/CurrencyEvent");
 const { syncBISTData } = require("./events/BISTEvent");
+const { syncBISTCompaniesCount} = require("./events/KAPEvent");
 const { getTelegramUser } = require("./events/TelegramUserEvent");
 const path = require("path");
 const strings = require("./constants/Strings.js");
@@ -22,11 +23,17 @@ const bot = new Telegraf(process.env.TELEGRAM_API_KEY);
 let config;
 (async () => {
   config = await getConfig();
-  updateGlobalCtx(bot.context);
   notifyUsersForNewSPKBulten(config);
   syncCurrencyData(config);
   syncBISTData(config);
+  syncBISTCompaniesCount(config);
 })();
+
+bot.command("setCTX", (ctx) => {
+  // /setCTX komutu olmadan CTX set etmeyi araştır.
+  updateGlobalCtx(ctx);
+  ctx.reply("CTX setted");
+});
 
 bot.command("kayit", (ctx) => {
   const msg = ctx.update.message;
@@ -85,9 +92,14 @@ bot.command(
   }
 );
 
-bot.on(message('text'), userRegistrationMiddleware, userAccessLogMiddleware(requestType.REQTYP_MESSAGE),  (ctx) => {
-  // console.log(ctx.update.message.text);
-})
+bot.on(
+  message("text"),
+  userRegistrationMiddleware,
+  userAccessLogMiddleware(requestType.REQTYP_MESSAGE),
+  (ctx) => {
+    // console.log(ctx.update.message.text);
+  }
+);
 
 bot.launch();
 
@@ -108,5 +120,3 @@ process.on("SIGINT", function () {
     process.exit();
   }
 });
-
-process.once("SIGTERM", () => bot.stop("SIGTERM"));

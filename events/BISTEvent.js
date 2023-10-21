@@ -1,11 +1,8 @@
-const { getTimeForLog } = require("../common/time.js");
+const { log } = require("../common/logging.js");
 const { BIST_updateLastControlTime } = require("../config/Config.js");
+require("dotenv").config();
 
-// const strings = require("../constants/Strings.js");
-// const axios = require("axios");
-// const cheerio = require("cheerio");
-
-let KEY = "BIST";
+const KEY = "BIST";
 async function syncBISTData(config) {
   const control_enabled = config[KEY]["control_enabled"]; // kontrol etme aktif mi?
   if (control_enabled) {
@@ -15,10 +12,9 @@ async function syncBISTData(config) {
       let control_interval = config[KEY]["control_interval"]; // kontrol aralığı
       let current_time_UNIX = new Date().getTime();
       if (current_time_UNIX > control_interval + last_control_time) {
-        console.log(getTimeForLog() + "BIST kontrolü geldi.");
-
-        // KUR KONTROLÜ VAKIFBANK API İZİN VERİLDİĞİNDE YAPILACAK
-
+        log("BIST kontrolü geldi.", syncBISTData);
+        
+        // KUR KONTROLÜ API İZİN VERİLDİĞİNDE YAPILACAK
         BIST_updateLastControlTime(config, new Date().getTime());
       }
     }, time_control_interval);

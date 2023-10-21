@@ -1,4 +1,4 @@
-const { getTimeForLog } = require("../common/time.js");
+const { log } = require("../common/logging.js");
 const {
   SPK_updateLastControlTime,
   SPK_updateLastBulten,
@@ -16,15 +16,14 @@ async function notifyUsersForNewSPKBulten(config) {
   const bulten_control_enabled = config[KEY]["control_enabled"];
 
   if (bulten_control_enabled) {
-    const bulten_time_control_interval =
-      config[KEY]["time_control_interval"];
+    const bulten_time_control_interval = config[KEY]["time_control_interval"];
 
     setInterval(() => {
       let last_control_time = config[KEY]["last_control_time"];
       let bulten_control_interval = config[KEY]["control_interval"];
       let current_time_UNIX = new Date().getTime();
       if (current_time_UNIX > bulten_control_interval + last_control_time) {
-        console.log(getTimeForLog() + "Bülten kontrolü geldi.");
+        log("Bülten kontrolü geldi.", notifyUsersForNewSPKBulten);
         let last_bulten_no = config[KEY]["last_bulten_no"];
         axios
           .get(config[KEY]["bulten_url"])
@@ -48,12 +47,12 @@ async function notifyUsersForNewSPKBulten(config) {
               .replace("Yayımlanma : ", "");
 
             if (last_bulten_no == baslik_text) {
-              console.log(getTimeForLog() + "Yeni bülten yok.");
+              log("Yeni bülten yok.", notifyUsersForNewSPKBulten);
 
               SPK_updateLastControlTime(config, new Date().getTime());
               return;
             } else {
-              console.log(getTimeForLog() + "Yeni bülten var, indiriliyor. ");
+              log("Yeni bülten var, indiriliyor.", notifyUsersForNewSPKBulten);
 
               sendMessageToAllTelegramUsers(
                 strings.NEW_BULTEN_MESSAGE(baslik_text, href)
@@ -61,9 +60,7 @@ async function notifyUsersForNewSPKBulten(config) {
 
               downloadFile(href, `./data/bultenler/${baslik_text}.pdf`)
                 .then(() => {
-                  console.log(
-                    `${getTimeForLog()}${baslik_text} numaralı bülten indirildi.`
-                  );
+                  log("Dosya indirildi.", notifyUsersForNewSPKBulten);
 
                   SPK_updateLastBulten(
                     config,
@@ -74,10 +71,7 @@ async function notifyUsersForNewSPKBulten(config) {
                   );
                 })
                 .catch((error) => {
-                  console.error(
-                    getTimeForLog() + "Dosya indirme sırasında hata oluştu:",
-                    error
-                  );
+                  console.error("Hata oluştu:", error);
                 });
             }
           })

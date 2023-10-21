@@ -1,5 +1,6 @@
 const TelegramUser = require("../model/TelegramUser.js");
 
+const { log } = require("../common/logging.js");
 let globalCtx;
 
 const updateGlobalCtx = (ctx) => {
@@ -12,7 +13,7 @@ async function sendMessageToTelegramUser(
   parse_mode = "Markdown"
 ) {
   if (!globalCtx) {
-    console.log("ctx is not available");
+    log("CTX set edilmemiş.", sendMessageToTelegramUser);
     return;
   }
   await globalCtx.telegram.sendMessage(user.id, message, {
