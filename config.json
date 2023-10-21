@@ -6,27 +6,28 @@
     "bulten_url": "https://spk.gov.tr/spk-bultenleri/2023-yili-spk-bultenleri",
     "last_bulten_no": "2023-63",
     "last_bulten_date": "19 Ekim 2023 Perşembe",
-    "last_control_time": 1697883542464,
+    "last_control_time": 1697892848507,
     "last_bulten_link": "https://spk.gov.tr/data/653162a08f95db1488ba8322/2023-63 (PGD).pdf"
   },
   "CURRENCY": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 900000,
-    "last_control_time": 1697883542058
+    "last_control_time": 1697892848313
   },
   "BIST": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 900000,
-    "last_control_time": 1697883542058
+    "last_control_time": 1697892848313
   },
   "KAP_BIST_COMPANY": {
     "control_enabled": 1,
     "time_control_interval": 60000,
     "control_interval": 3600000,
-    "last_control_time": 1697884330033,
+    "last_control_time": 1697891603494,
     "company_count": 633,
-    "company_url": "https://www.kap.org.tr/tr/bist-sirketler"
+    "base_url": "https://www.kap.org.tr/",
+    "sirketler_url": "bist-sirketler"
   }
 }

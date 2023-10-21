@@ -1,5 +1,12 @@
 const AccessLog = require("../model/AccessLog");
-
+const { increaseAccessCount } = require("../events/TelegramUserEvent");
+/**
+ * Kullanıcının isteklerini loglayan fonksiyon.
+ * @param {number} userID - Telegram kullanıcısı id'si
+ * @param {number} requestType - İstek tipi
+ * @param {string} requestContent - İstek içeriği (opsiyonel)
+ * @returns 
+ */
 async function logAccess(userID, requestType, requestContent = undefined) {
   const accessLog = new AccessLog({
     userID,
@@ -19,11 +26,15 @@ async function logAccess(userID, requestType, requestContent = undefined) {
   });
 }
 
+/**
+ * Kullanıcının isteklerini loglayan middleware.
+ * @param {number} requestType - İstek tipi
+ */
 const userAccessLogMiddleware = (requestType) => {
   return (ctx, next) => {
     const msg = ctx.update.message;
     const user = ctx.user;
-
+    increaseAccessCount(user);
     if (msg.text.startsWith("/")) {
       const param = msg.text.split(" ");
       if (param.length > 1) {

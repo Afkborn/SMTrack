@@ -12,6 +12,10 @@ const cheerio = require("cheerio");
 let KEY = "SPK";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // SSL sertifikası olmayan siteler için
 
+/**
+ * Asenkron olarak SPK'nın sitesine gidip yeni bülten olup olmadığını kontrol eden, var ise kullanıcılara mesaj atan fonksiyon.
+ * @param {object} config - Yapılandırma bilgilerini içeren nesne.
+ */
 async function notifyUsersForNewSPKBulten(config) {
   const bulten_control_enabled = config[KEY]["control_enabled"];
 

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-
+/**
+ * BIST şirketlerini tutan schema.
+ */
 const BISTCompanySchema = new mongoose.Schema(
   {
     name: {

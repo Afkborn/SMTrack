@@ -1,3 +1,7 @@
+/**
+ * Zamanı log için uygun formata çeviren fonksiyon.
+ * @returns {string} - Zamanı HH:MM:SS:MS olarak döndürür.
+ */
 function getTimeForLog() {
   const date = new Date();
   const hours = date.getHours();
@@ -7,6 +11,11 @@ function getTimeForLog() {
   return `${hours}:${minutes}:${seconds}:${milliseconds}\t| `;
 }
 
+/**
+ * Verilen tarih bilgisini dd.mm.yyyy formatına çeviren fonksiyon.
+ * @param {string} timeString - Tarih ve saat bilgisi
+ * @returns {string} - Tarihi dd.mm.yyyy olarak döndürür.
+ */
 function convertTime(timeString) {
   const date = new Date(timeString);
   const day = date.getDate();
@@ -15,6 +24,11 @@ function convertTime(timeString) {
   return `${day}.${month}.${year}`;
 }
 
+/**
+ * Verilen tarih bilgisinden bugüne kadar geçen gün sayısını döndüren fonksiyon.
+ * @param {string} dateString 
+ * @returns {number} - Bugüne kadar geçen gün sayısı
+ */
 function getDifferenceFromToday(dateString) {
   const today = new Date();
   const date = new Date(dateString);

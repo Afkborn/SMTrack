@@ -3,6 +3,10 @@ const { BIST_updateLastControlTime } = require("../config/Config.js");
 require("dotenv").config();
 
 const KEY = "BIST";
+/**
+ * Asenkron olarak BIST şirketlerine ait verileri senkronize eden fonksiyon.
+ * @param {object} config - Yapılandırma bilgilerini içeren nesne.
+ */
 async function syncBISTData(config) {
   const control_enabled = config[KEY]["control_enabled"]; // kontrol etme aktif mi?
   if (control_enabled) {

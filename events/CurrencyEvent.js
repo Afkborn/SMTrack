@@ -2,7 +2,10 @@ const { log } = require("../common/logging.js");
 const { CURRENCY_updateLastControlTime } = require("../config/Config.js");
 
 const KEY = "CURRENCY";
-
+/**
+ * Asenkron olarak para birimlerine ait verileri senkronize eden fonksiyon.
+ * @param {object} config - Yapılandırma bilgilerini içeren nesne.
+ */
 async function syncCurrencyData(config) {
   const control_enabled = config[KEY]["control_enabled"]; // kontrol etme aktif mi?
   if (control_enabled) {

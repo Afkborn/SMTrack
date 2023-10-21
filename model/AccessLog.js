@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+/**
+ * Telegram kullanıcısının erişim loglarını tutan schema.
+ */
 const AccessLogSchema = new mongoose.Schema({
   userID: {
     type: mongoose.Schema.Types.ObjectId,

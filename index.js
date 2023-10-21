@@ -11,11 +11,16 @@ const { getConfig, saveConfig } = require("./config/Config");
 const { notifyUsersForNewSPKBulten } = require("./events/SPKBultenEvent");
 const { syncCurrencyData } = require("./events/CurrencyEvent");
 const { syncBISTData } = require("./events/BISTEvent");
-const { syncBISTCompaniesCount} = require("./events/KAPEvent");
+const {
+  syncBISTCompanies,
+  getBISTCompany,
+  getBISTCompanies,
+} = require("./events/BISTCompanyEvent");
 const { getTelegramUser } = require("./events/TelegramUserEvent");
 const path = require("path");
 const strings = require("./constants/Strings.js");
 const requestType = require("./constants/RequestTypes.js");
+
 require("dotenv").config();
 mongoDbConnect();
 
@@ -26,7 +31,7 @@ let config;
   notifyUsersForNewSPKBulten(config);
   syncCurrencyData(config);
   syncBISTData(config);
-  syncBISTCompaniesCount(config);
+  syncBISTCompanies(config);
 })();
 
 bot.command("setCTX", (ctx) => {
@@ -88,6 +93,69 @@ bot.command(
         ),
         { parse_mode: "Markdown" }
       );
+    }
+  }
+);
+
+bot.command(
+  "bist",
+  userRegistrationMiddleware,
+  userAccessLogMiddleware(requestType.REQTYP_BIST),
+  (ctx) => {
+    const msg = ctx.update.message;
+    if (msg.text.split(" ").length > 1) {
+      const companyCode = msg.text.split(" ")[1];
+      getBISTCompany(companyCode).then((company) => {
+        if (company) {
+          if (company.href) {
+            let href = config.KAP_BIST_COMPANY.base_url + company.href;
+            ctx.reply(strings.BIST_DETAIL(company.name, href), {
+              parse_mode: "Markdown",
+            });
+          } else {
+            ctx.reply(
+              strings.BIST_DETAIL(
+                company.name,
+                "https://www.kap.org.tr/tr/bist-sirketler"
+              ),
+              { parse_mode: "Markdown" }
+            );
+          }
+        } else {
+          ctx.reply("Şirket bulunamadı.");
+        }
+      });
+    } else {
+      ctx.reply(strings.BIST_NO_PARAMS(config.KAP_BIST_COMPANY.company_count), {
+        parse_mode: "Markdown",
+      });
+    }
+  }
+);
+
+bot.command(
+  "bistlist",
+  userRegistrationMiddleware,
+  userAccessLogMiddleware(requestType.REQTYP_BISTLIST),
+  (ctx) => {
+    const msg = ctx.update.message;
+    if (msg.text.split(" ").length > 1) {
+      const firstLetter = msg.text.split(" ")[1];
+      getBISTCompanies(firstLetter).then((companies) => {
+        if (companies) {
+          let companiesText = "";
+          companies.forEach((company) => {
+            companiesText += `*${company.code}* - ${company.name}\n`;
+          });
+          ctx.reply(strings.BIST_LIST(firstLetter, companiesText), {
+            parse_mode: "Markdown",
+          });
+        } else {
+          ctx.reply("Şirket bulunamadı.");
+        }
+      });
+    } else {
+      ctx.reply(strings.BIST_FIRST_LETTER_REQ);
     }
   }
 );

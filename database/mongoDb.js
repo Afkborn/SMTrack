@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 require("dotenv/config");
 const {getTimeForLog} = require("../common/time");
-
+/**
+ * MongoDB Atlas'a bağlanan fonksiyon.
+ */
 async function mongoDbConnect() {
   mongoose.set("strictQuery", true);
   mongoose

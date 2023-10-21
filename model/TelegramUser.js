@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-
+/**
+ * Telegram kullanıcısını tutan schema.
+ */
 const TelegramUserSchema = new mongoose.Schema(
   {
     first_name: {
@@ -21,7 +23,7 @@ const TelegramUserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    access_log_count: {
+    access_count: {
       type: Number,
       default: 0,
     },
