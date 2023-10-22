@@ -38,13 +38,6 @@ let config;
   getDisclosures(config);
 })();
 
-// bot.command("setCTX", (ctx) => {
-//   // /setCTX komutu olmadan CTX set etmeyi araştır.
-//   updateGlobalCtx(ctx);
-//   console.log(ctx)
-//   ctx.reply("CTX setted");
-// });
-
 bot.command("kayit", (ctx) => {
   const msg = ctx.update.message;
   getTelegramUser(msg.from.id).then((user) => {
@@ -81,7 +74,6 @@ bot.command(
   userRegistrationMiddleware,
   userAccessLogMiddleware(requestType.REQTYP_BULTEN),
   (ctx) => {
-    
     const msg = ctx.update.message;
     if (msg.text.split(" ").length > 1) {
       const bultenNo = msg.text.split(" ")[1];

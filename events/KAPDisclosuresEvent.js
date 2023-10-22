@@ -38,9 +38,44 @@ async function getDisclosures(config) {
           disclosures.forEach((disclosure) => {
             let stockCodes = disclosure.basic.stockCodes;
             if (stockCodes == "") {
-              console.log(
-                "StockCodes boş geldi. KapId: " + disclosure.basic.disclosureId
-              );
+              new KAPDisclosure({
+                kapId: disclosure.basic.disclosureId,
+                index: disclosure.basic.disclosureIndex,
+                class: disclosure.basic.disclosureClass,
+                type: disclosure.basic.disclosureType,
+                category: disclosure.basic.disclosureCategory,
+                title: disclosure.basic.title,
+                companyKapId: disclosure.basic.companyId,
+                companyName: disclosure.basic.companyName,
+                summary: disclosure.summary,
+              })
+                .save()
+                .then((result) => {
+                  KAP_BIST_Disclosures_updateLastDisclosureId(
+                    config,
+                    result.kapId
+                  );
+                  log(
+                    "KAP açıklaması kaydedildi. " + result.kapId,
+                    getDisclosures
+                  );
+                  let href =
+                    "https://www.kap.org.tr/tr/Bildirim/" + result.index;
+                  let title = `${result.companyName} ${result.title}`;
+                  sendMessageToAllTelegramUsers(
+                    strings.KAP_DISCLOSURE_NEW(title, href)
+                  );
+                })
+                .catch((error) => {
+                  if (error.code == 11000) {
+                    return;
+                  } else {
+                    log(
+                      "KAP açıklaması kaydedilemedi. " + error,
+                      getDisclosures
+                    );
+                  }
+                });
             } else {
               getBISTCompany(stockCodes).then((company) => {
                 if (company) {
@@ -69,18 +104,14 @@ async function getDisclosures(config) {
                       );
                       let href =
                         "https://www.kap.org.tr/tr/Bildirim/" + result.index;
-                      let title = `${result.companyName} ${result.title}`; 
+                      let title = `${result.companyName} ${result.title}`;
                       sendMessageToAllTelegramUsers(
                         strings.KAP_DISCLOSURE_NEW(title, href)
                       );
                     })
                     .catch((error) => {
                       if (error.code == 11000) {
-                        log(
-                          "KAP açıklaması zaten kayıtlı. " +
-                            error.keyValue.kapId,
-                          getDisclosures
-                        );
+                        return;
                       } else {
                         log(
                           "KAP açıklaması kaydedilemedi. " + error,

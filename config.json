@@ -6,20 +6,20 @@
     "bulten_url": "https://spk.gov.tr/spk-bultenleri/2023-yili-spk-bultenleri",
     "last_bulten_no": "2023-63",
     "last_bulten_date": "19 Ekim 2023 Perşembe",
-    "last_control_time": 1697988021893,
+    "last_control_time": 1697988939019,
     "last_bulten_link": "https://spk.gov.tr/data/653162a08f95db1488ba8322/2023-63 (PGD).pdf"
   },
   "CURRENCY": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 900000,
-    "last_control_time": 1697988021705
+    "last_control_time": 1697988924487
   },
   "BIST": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 900000,
-    "last_control_time": 1697988021705
+    "last_control_time": 1697988924487
   },
   "KAP_BIST_COMPANY": {
     "control_enabled": 1,
@@ -34,8 +34,8 @@
     "control_enabled": 1,
     "time_control_interval": 1000,
     "control_interval": 60000,
-    "last_control_time": 0,
-    "last_disclosure_id": "0",
+    "last_control_time": 1697989649169,
+    "last_disclosure_id": "8ad8a94e882766e22d931cbc2a14caaca29e3040",
     "base_url": "https://www.kap.org.tr/tr/api/disclosures"
   }
 }
