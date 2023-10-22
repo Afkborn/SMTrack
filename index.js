@@ -136,9 +136,9 @@ bot.command(
   userRegistrationMiddleware,
   userAccessLogMiddleware(requestType.REQTYP_BISTLIST),
   (ctx) => {
-    const msg = ctx.update.message;
+    let msg = ctx.update.message;
     if (msg.text.split(" ").length > 1) {
-      const firstLetter = msg.text.split(" ")[1];
+      const firstLetter = msg.text.split(" ")[1].toUpperCase();
       getBISTCompanies(firstLetter).then((companies) => {
         if (companies) {
           let companiesText = "";
