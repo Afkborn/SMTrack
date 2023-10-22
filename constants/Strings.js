@@ -11,4 +11,5 @@ module.exports = {
     BIST_DETAIL : (bistName, bistHref) => `${bistName} 'in detaylarına ulaşmak için [tıklayın](${bistHref})`,
     BIST_LIST : (letter, bistList) => `${letter} harfi ile kayıtlı şirketler\n${bistList}`,
     BIST_FIRST_LETTER_REQ : "BIST şirketlerini listelemek için ilk harfi girmelisiniz. Örnek kullanım: /bistlist A",
+    KAP_DISCLOSURE_NEW : (title, href) => `Yeni KAP açıklaması yayınlandı! Başlık: ${title} ulaşmak için [tıklayın](${href})`,
 };

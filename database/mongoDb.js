@@ -3,6 +3,7 @@ require("dotenv/config");
 const {getTimeForLog} = require("../common/time");
 /**
  * MongoDB Atlas'a bağlanan fonksiyon.
+ * Bağlantıyı kurmak için .env dosyasında MONGO_DB_CONNECTION değişkenine MongoDB Atlas bağlantı linkini girmeniz gerekmektedir.
  */
 async function mongoDbConnect() {
   mongoose.set("strictQuery", true);

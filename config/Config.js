@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * Yapılandırma dosyasını kaydeden fonksiyon.
+ * @param {string} configFilePath
+ * @param {JSON} configData
+ */
 async function saveConfig(configFilePath, configData) {
   return new Promise((resolve, reject) => {
     fs.writeFile(configFilePath, JSON.stringify(configData, null, 2), (err) => {
@@ -14,6 +19,10 @@ async function saveConfig(configFilePath, configData) {
   });
 }
 
+/**
+ * Yapılandırma dosyasını okuyan fonksiyon.
+ * @returns {JSON} - Yapılandırma dosyasının içeriğini döndürür.
+ */
 async function getConfig() {
   const configFilePath = path.resolve("config.json");
   let configData = require(configFilePath);
@@ -21,7 +30,6 @@ async function getConfig() {
 }
 
 async function SPK_updateLastControlTime(configData, newTime) {
-  // Değerleri güncelle
   configData.SPK.last_control_time = newTime;
 }
 
@@ -32,33 +40,37 @@ async function SPK_updateLastBulten(
   newBultenDate,
   newBultenLink
 ) {
-  // Değerleri güncelle
-
   configData.SPK.last_control_time = newTime;
   configData.SPK.last_bulten_no = newBultenNo;
   configData.SPK.last_bulten_date = newBultenDate;
   configData.SPK.last_bulten_link = newBultenLink;
-} 
+}
 
 async function CURRENCY_updateLastControlTime(configData, newTime) {
-  // Değerleri güncelle
   configData.CURRENCY.last_control_time = newTime;
 }
 
 async function BIST_updateLastControlTime(configData, newTime) {
-  // Değerleri güncelle
   configData.BIST.last_control_time = newTime;
 }
 
 async function KAP_BIST_Company_updateLastControlTime(configData, newTime) {
-  // Değerleri güncelle
   configData.KAP_BIST_COMPANY.last_control_time = newTime;
 }
 
 async function KAP_BIST_Company_updateCompanyCount(configData, newCount) {
-  // Değerleri güncelle
   configData.KAP_BIST_COMPANY.company_count = newCount;
 }
+
+// KAP_BIST_DISCLOSURES
+async function KAP_BIST_Disclosures_updateLastControlTime(configData, newTime) {
+  configData.KAP_BIST_DISCLOSURES.last_control_time = newTime;
+}
+
+async function KAP_BIST_Disclosures_updateLastDisclosureId(configData, newId) {
+  configData.KAP_BIST_DISCLOSURES.last_disclosure_id = newId;
+}
+
 
 module.exports = {
   saveConfig,
@@ -69,4 +81,6 @@ module.exports = {
   BIST_updateLastControlTime,
   KAP_BIST_Company_updateLastControlTime,
   KAP_BIST_Company_updateCompanyCount,
+  KAP_BIST_Disclosures_updateLastControlTime,
+  KAP_BIST_Disclosures_updateLastDisclosureId,
 };

@@ -23,7 +23,7 @@ async function sendMessageToTelegramUser(
     log("CTX set edilmemiş.", sendMessageToTelegramUser);
     return;
   }
-  await globalCtx.telegram.sendMessage(user.id, message, {
+  await globalCtx.sendMessage(user.id, message, {
     parse_mode: parse_mode,
   });
 }

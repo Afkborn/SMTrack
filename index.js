@@ -16,6 +16,7 @@ const {
   getBISTCompany,
   getBISTCompanies,
 } = require("./events/BISTCompanyEvent");
+const { getDisclosures } = require("./events/KAPDisclosuresEvent");
 const { getTelegramUser } = require("./events/TelegramUserEvent");
 const path = require("path");
 const strings = require("./constants/Strings.js");
@@ -25,20 +26,24 @@ require("dotenv").config();
 mongoDbConnect();
 
 const bot = new Telegraf(process.env.TELEGRAM_API_KEY);
+
 let config;
 (async () => {
   config = await getConfig();
+  updateGlobalCtx(bot.telegram);
   notifyUsersForNewSPKBulten(config);
   syncCurrencyData(config);
   syncBISTData(config);
   syncBISTCompanies(config);
+  getDisclosures(config);
 })();
 
-bot.command("setCTX", (ctx) => {
-  // /setCTX komutu olmadan CTX set etmeyi araştır.
-  updateGlobalCtx(ctx);
-  ctx.reply("CTX setted");
-});
+// bot.command("setCTX", (ctx) => {
+//   // /setCTX komutu olmadan CTX set etmeyi araştır.
+//   updateGlobalCtx(ctx);
+//   console.log(ctx)
+//   ctx.reply("CTX setted");
+// });
 
 bot.command("kayit", (ctx) => {
   const msg = ctx.update.message;
@@ -76,6 +81,7 @@ bot.command(
   userRegistrationMiddleware,
   userAccessLogMiddleware(requestType.REQTYP_BULTEN),
   (ctx) => {
+    
     const msg = ctx.update.message;
     if (msg.text.split(" ").length > 1) {
       const bultenNo = msg.text.split(" ")[1];

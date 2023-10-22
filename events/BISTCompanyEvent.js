@@ -9,7 +9,7 @@ const cheerio = require("cheerio");
 const KEY = "KAP_BIST_COMPANY";
 
 /**
- * Asenkron olarak BIST şirketlerini senkronize eden fonksiyon.
+ * Asenkron olarak BIST şirketlerini  KAP'dan senkronize eden fonksiyon.
  * @param {object} config - Yapılandırma bilgilerini içeren nesne.
  */
 async function syncBISTCompanies(config) {
@@ -101,6 +101,7 @@ async function syncBISTCompanies(config) {
     }, time_control_interval);
   }
 }
+
 
 /**
  * Şirket bilgilerini veritabanından çeken fonksiyon.

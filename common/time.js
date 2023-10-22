@@ -26,7 +26,7 @@ function convertTime(timeString) {
 
 /**
  * Verilen tarih bilgisinden bugüne kadar geçen gün sayısını döndüren fonksiyon.
- * @param {string} dateString 
+ * @param {string} dateString
  * @returns {number} - Bugüne kadar geçen gün sayısı
  */
 function getDifferenceFromToday(dateString) {
@@ -37,4 +37,16 @@ function getDifferenceFromToday(dateString) {
   return diffDays;
 }
 
-module.exports = { getTimeForLog, convertTime, getDifferenceFromToday };
+/**
+ * Bugünün tarihini YYYY-MM-DD formatında döndüren fonksiyon.
+ * @returns {string} - Bugünün tarihi
+ */
+function getToday_YYYYMMDD() {
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+  return `${year}-${month}-${day}`;
+}
+
+module.exports = { getTimeForLog, convertTime, getDifferenceFromToday, getToday_YYYYMMDD };
