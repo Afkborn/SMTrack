@@ -34,7 +34,7 @@
     "control_enabled": 1,
     "time_control_interval": 1000,
     "control_interval": 60000,
-    "last_control_time": 1698092773241,
+    "last_control_time": 1698093060210,
     "last_disclosure_id": "1e990617b3fdbd4e74f0b81057c050e999dd129d",
     "base_url": "https://www.kap.org.tr/tr/api/disclosures"
   }

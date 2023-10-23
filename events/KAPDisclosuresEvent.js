@@ -140,7 +140,6 @@ async function getDisclosuresByIGS_ODA(config) {
 
         axios.get(url).then((response) => {
           let disclosures = response.data;
-          console.log("disclosures length: " + disclosures.length);
           disclosures.forEach((disclosure) => {
             let stockCodes = disclosure.basic.stockCodes;
             if (stockCodes == "") {
