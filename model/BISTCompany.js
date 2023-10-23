@@ -21,7 +21,6 @@ const BISTCompanySchema = new mongoose.Schema(
     },
     href: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true }

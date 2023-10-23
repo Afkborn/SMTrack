@@ -9,6 +9,7 @@ const {
   KAP_BIST_Disclosures_updateLastControlTime,
   KAP_BIST_Disclosures_updateLastDisclosureId,
 } = require("../config/Config.js");
+const BISTCompany = require("../model/BISTCompany.js");
 const strings = require("../constants/Strings.js");
 // const KAP_MemberTypes = require("../constants/KAPMemberTypes.js");
 // const KAP_DisclosureTypes = require("../constants/KAPDisclosuresTypes.js");
@@ -31,11 +32,14 @@ async function getDisclosures(config) {
         let toDate = getToday_YYYYMMDD(); // bugünün tarihi
         // fromDate toDate aynı çünkü bugünün tarihindeki açıklamaları almak istiyoruz.
         let baseURL = config[KEY]["base_url"]; // KAP API adresi
-        let url = baseURL + "?fromDate=" + fromDate + "&toDate=" + toDate;
+        let ts = Math.round(Math.random() * 1000000000); // KAP API adresine eklenen ts parametresi, her istekte farklı oluyor, bu yüzden random bir sayı oluşturuyoruz tıpkı KAP'ın sitesindeki gibi.
 
+        let url =
+          baseURL + "?ts=" + ts + "&fromDate=" + fromDate + "&toDate=" + toDate;
         axios.get(url).then((response) => {
           let disclosures = response.data;
           disclosures.forEach((disclosure) => {
+            if (disclosure.basic.disclosureType == "FON") return; // fon bilgilerini kayıt etmeyelim.
             let stockCodes = disclosure.basic.stockCodes;
             if (stockCodes == "") {
               new KAPDisclosure({
@@ -62,6 +66,9 @@ async function getDisclosures(config) {
                   let href =
                     "https://www.kap.org.tr/tr/Bildirim/" + result.index;
                   let title = `${result.companyName} ${result.title}`;
+
+                  
+
                   sendMessageToAllTelegramUsers(
                     strings.KAP_DISCLOSURE_NEW(title, href)
                   );
@@ -120,6 +127,26 @@ async function getDisclosures(config) {
                       }
                     });
                 } else {
+                  console.log(disclosure.basic.companyName + " bulunamadı.");
+
+                  const company = new BISTCompany({
+                    name: disclosure.basic.companyName,
+                    code: disclosure.basic.stockCodes,
+                    city: "",
+                    auditor: "",
+                    href: "",
+                  });
+                  company.save().catch((error) => {
+                    if (error.code === 11000) {
+                      return;
+                    } else {
+                      log(
+                        `Şirket ${company.name} kayıt edilirken hata oluştu.`,
+                        getDisclosures
+                      );
+                    }
+                  });
+
                   log(
                     "KAP açıklaması kaydedilemedi. " +
                       stockCodes +
