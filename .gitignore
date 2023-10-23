@@ -1,7 +1,7 @@
 /node_modules
 /data
 .env
-
+config.json
 test.html
 test.js
 TODO.md 
