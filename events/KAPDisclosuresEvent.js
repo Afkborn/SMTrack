@@ -11,14 +11,106 @@ const {
 } = require("../config/Config.js");
 const BISTCompany = require("../model/BISTCompany.js");
 const strings = require("../constants/Strings.js");
-// const KAP_MemberTypes = require("../constants/KAPMemberTypes.js");
-// const KAP_DisclosureTypes = require("../constants/KAPDisclosuresTypes.js");
+const KAPDisclosuresTypes = require("../constants/KAPDisclosuresTypes.js");
+const KAPMemberTypes = require("../constants/KAPMemberTypes.js");
+
+async function sendDisclosureToUsers(disclosure) {
+  let href = "https://www.kap.org.tr/tr/Bildirim/" + disclosure.index;
+  let title = `${disclosure.companyName} ${disclosure.title}`;
+  sendMessageToAllTelegramUsers(strings.KAP_DISCLOSURE_NEW(title, href));
+}
+
+async function handleNoStockCodes(disclosure, config) {
+  new KAPDisclosure({
+    kapId: disclosure.basic.disclosureId,
+    index: disclosure.basic.disclosureIndex,
+    class: disclosure.basic.disclosureClass,
+    type: disclosure.basic.disclosureType,
+    category: disclosure.basic.disclosureCategory,
+    title: disclosure.basic.title,
+    companyKapId: disclosure.basic.companyId,
+    companyName: disclosure.basic.companyName,
+    summary: disclosure.summary,
+    attachmentsCount: disclosure.basic.attachmentCount,
+  })
+    .save()
+    .then((result) => {
+      KAP_BIST_Disclosures_updateLastDisclosureId(config, result.kapId);
+      log("KAP açıklaması kaydedildi. " + result.kapId, handleNoStockCodes);
+      sendDisclosureToUsers(result);
+      // downloadDisclosureDetails(result);
+    })
+    .catch((error) => {
+      if (error.code == 11000) {
+        return;
+      } else {
+        log("KAP açıklaması kaydedilemedi. " + error, handleNoStockCodes);
+      }
+    });
+}
+
+async function handleWithStockCodes(disclosure, config) {
+  getBISTCompany(disclosure.basic.stockCodes).then((company) => {
+    if (company) {
+      new KAPDisclosure({
+        kapId: disclosure.basic.disclosureId,
+        index: disclosure.basic.disclosureIndex,
+        class: disclosure.basic.disclosureClass,
+        type: disclosure.basic.disclosureType,
+        category: disclosure.basic.disclosureCategory,
+        title: disclosure.basic.title,
+        companyKapId: disclosure.basic.companyId,
+        companyMongoId: company._id,
+        companyName: disclosure.basic.companyName,
+        stockCodes: disclosure.basic.stockCodes,
+        summary: disclosure.summary,
+        attachmentsCount: disclosure.basic.attachmentCount,
+      })
+        .save()
+        .then((result) => {
+          KAP_BIST_Disclosures_updateLastDisclosureId(config, result.kapId);
+          log("KAP açıklaması kaydedildi. " + result.kapId, handleWithStockCodes);
+          sendDisclosureToUsers(result);
+          // downloadDisclosureDetails(result);
+        })
+        .catch((error) => {
+          if (error.code == 11000) {
+            return;
+          } else {
+            log("KAP açıklaması kaydedilemedi. " + error, handleWithStockCodes);
+          }
+        });
+    } else {
+      BISTCompany({
+        name: disclosure.basic.companyName,
+        code: disclosure.basic.stockCodes,
+        city: "",
+        auditor: "",
+        href: "",
+      })
+        .save()
+        .catch((error) => {
+          if (error.code == 11000) {
+            return;
+          } else {
+            log("KAP açıklaması kaydedilemedi. " + error, getDisclosures);
+          }
+        });
+      log(
+        "KAP açıklaması kaydedilemedi. " +
+          disclosure.basic.stockCodes +
+          " şirketi bulunamadı.",
+        getDisclosures
+      );
+    }
+  });
+}
 
 /**
  * Asenkron olarak o güne ait olan KAP açıklamalarını senkronize eden, güncel bir açıklama var ise kullanıcılara bildiren fonksiyon.
  * @param {object} config - Yapılandırma bilgilerini içeren nesne.
  */
-async function getDisclosures(config) {
+async function getDisclosuresByIGS_ODA(config) {
   const control_enabled = config[KEY]["control_enabled"]; // kontrol etme aktif mi?
   if (control_enabled) {
     const time_control_interval = config[KEY]["time_control_interval"]; // kontrol etme zamanının gelip gelmediğini kontrol eden süre değişkeni
@@ -27,140 +119,40 @@ async function getDisclosures(config) {
       let control_interval = config[KEY]["control_interval"]; // kontrol aralığı
       let current_time_UNIX = new Date().getTime();
       if (current_time_UNIX > control_interval + last_control_time) {
-        log("KAP Disclosures kontrolü geldi.", getDisclosures);
+        log("KAP Disclosures kontrolü geldi.", getDisclosuresByIGS_ODA);
         let fromDate = getToday_YYYYMMDD(); // bugünün tarihi
         let toDate = getToday_YYYYMMDD(); // bugünün tarihi
         // fromDate toDate aynı çünkü bugünün tarihindeki açıklamaları almak istiyoruz.
         let baseURL = config[KEY]["base_url"]; // KAP API adresi
         let ts = Math.round(Math.random() * 1000000000); // KAP API adresine eklenen ts parametresi, her istekte farklı oluyor, bu yüzden random bir sayı oluşturuyoruz tıpkı KAP'ın sitesindeki gibi.
-
         let url =
-          baseURL + "?ts=" + ts + "&fromDate=" + fromDate + "&toDate=" + toDate;
+          baseURL +
+          "?ts=" +
+          ts +
+          "&disclosureTypes=" +
+          KAPDisclosuresTypes.OzelDurumAciklamasi +
+          "&fromDate=" +
+          fromDate +
+          "&toDate=" +
+          toDate +
+          "&memberTypes=" +
+          KAPMemberTypes.BISTSirketleri;
+
         axios.get(url).then((response) => {
           let disclosures = response.data;
+          console.log("disclosures length: " + disclosures.length);
           disclosures.forEach((disclosure) => {
-            if (disclosure.basic.disclosureType == "FON") return; // fon bilgilerini kayıt etmeyelim.
             let stockCodes = disclosure.basic.stockCodes;
             if (stockCodes == "") {
-              new KAPDisclosure({
-                kapId: disclosure.basic.disclosureId,
-                index: disclosure.basic.disclosureIndex,
-                class: disclosure.basic.disclosureClass,
-                type: disclosure.basic.disclosureType,
-                category: disclosure.basic.disclosureCategory,
-                title: disclosure.basic.title,
-                companyKapId: disclosure.basic.companyId,
-                companyName: disclosure.basic.companyName,
-                summary: disclosure.summary,
-              })
-                .save()
-                .then((result) => {
-                  KAP_BIST_Disclosures_updateLastDisclosureId(
-                    config,
-                    result.kapId
-                  );
-                  log(
-                    "KAP açıklaması kaydedildi. " + result.kapId,
-                    getDisclosures
-                  );
-                  let href =
-                    "https://www.kap.org.tr/tr/Bildirim/" + result.index;
-                  let title = `${result.companyName} ${result.title}`;
-
-                  
-
-                  sendMessageToAllTelegramUsers(
-                    strings.KAP_DISCLOSURE_NEW(title, href)
-                  );
-                })
-                .catch((error) => {
-                  if (error.code == 11000) {
-                    return;
-                  } else {
-                    log(
-                      "KAP açıklaması kaydedilemedi. " + error,
-                      getDisclosures
-                    );
-                  }
-                });
+              handleNoStockCodes(disclosure, config);
             } else {
-              getBISTCompany(stockCodes).then((company) => {
-                if (company) {
-                  new KAPDisclosure({
-                    kapId: disclosure.basic.disclosureId,
-                    index: disclosure.basic.disclosureIndex,
-                    class: disclosure.basic.disclosureClass,
-                    type: disclosure.basic.disclosureType,
-                    category: disclosure.basic.disclosureCategory,
-                    title: disclosure.basic.title,
-                    companyKapId: disclosure.basic.companyId,
-                    companyMongoId: company._id,
-                    companyName: disclosure.basic.companyName,
-                    stockCodes: disclosure.basic.stockCodes,
-                    summary: disclosure.summary,
-                  })
-                    .save()
-                    .then((result) => {
-                      KAP_BIST_Disclosures_updateLastDisclosureId(
-                        config,
-                        result.kapId
-                      );
-                      log(
-                        "KAP açıklaması kaydedildi. " + result.kapId,
-                        getDisclosures
-                      );
-                      let href =
-                        "https://www.kap.org.tr/tr/Bildirim/" + result.index;
-                      let title = `${result.companyName} ${result.title}`;
-                      sendMessageToAllTelegramUsers(
-                        strings.KAP_DISCLOSURE_NEW(title, href)
-                      );
-                    })
-                    .catch((error) => {
-                      if (error.code == 11000) {
-                        return;
-                      } else {
-                        log(
-                          "KAP açıklaması kaydedilemedi. " + error,
-                          getDisclosures
-                        );
-                      }
-                    });
-                } else {
-                  console.log(disclosure.basic.companyName + " bulunamadı.");
-
-                  const company = new BISTCompany({
-                    name: disclosure.basic.companyName,
-                    code: disclosure.basic.stockCodes,
-                    city: "",
-                    auditor: "",
-                    href: "",
-                  });
-                  company.save().catch((error) => {
-                    if (error.code === 11000) {
-                      return;
-                    } else {
-                      log(
-                        `Şirket ${company.name} kayıt edilirken hata oluştu.`,
-                        getDisclosures
-                      );
-                    }
-                  });
-
-                  log(
-                    "KAP açıklaması kaydedilemedi. " +
-                      stockCodes +
-                      " şirketi bulunamadı.",
-                    getDisclosures
-                  );
-                }
-              });
-              KAP_BIST_Disclosures_updateLastControlTime(
-                config,
-                new Date().getTime()
-              );
+              handleWithStockCodes(disclosure, config);
             }
           });
+          KAP_BIST_Disclosures_updateLastControlTime(
+            config,
+            new Date().getTime()
+          );
         });
       }
     }, time_control_interval);
@@ -168,5 +160,5 @@ async function getDisclosures(config) {
 }
 
 module.exports = {
-  getDisclosures,
+  getDisclosuresByIGS_ODA,
 };

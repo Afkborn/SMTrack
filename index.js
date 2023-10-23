@@ -16,7 +16,7 @@ const {
   getBISTCompany,
   getBISTCompanies,
 } = require("./events/BISTCompanyEvent");
-const { getDisclosures } = require("./events/KAPDisclosuresEvent");
+const { getDisclosuresByIGS_ODA } = require("./events/KAPDisclosuresEvent");
 const { getTelegramUser } = require("./events/TelegramUserEvent");
 const path = require("path");
 const strings = require("./constants/Strings.js");
@@ -35,7 +35,7 @@ let config;
   syncCurrencyData(config);
   syncBISTData(config);
   syncBISTCompanies(config);
-  getDisclosures(config);
+  getDisclosuresByIGS_ODA(config);
 })();
 
 bot.command("kayit", (ctx) => {

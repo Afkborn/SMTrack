@@ -45,6 +45,14 @@ const KAPDisclosureSchema = new mongoose.Schema(
     summary: {
       type: String,
     },
+    attachmentsCount: {
+      type: Number,
+      default: 0,
+    },
+    detailsDownloaded: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
