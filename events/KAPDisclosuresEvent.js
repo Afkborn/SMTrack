@@ -69,7 +69,10 @@ async function handleWithStockCodes(disclosure, config) {
         .save()
         .then((result) => {
           KAP_BIST_Disclosures_updateLastDisclosureId(config, result.kapId);
-          log("KAP açıklaması kaydedildi. " + result.kapId, handleWithStockCodes);
+          log(
+            "KAP açıklaması kaydedildi. " + result.kapId,
+            handleWithStockCodes
+          );
           sendDisclosureToUsers(result);
           // downloadDisclosureDetails(result);
         })
@@ -158,6 +161,19 @@ async function getDisclosuresByIGS_ODA(config) {
   }
 }
 
+async function getUndownloadedDisclosures() {
+  return new Promise((resolve, reject) => {
+    KAPDisclosure.find({ detailsDownloaded: false })
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}
+
 module.exports = {
   getDisclosuresByIGS_ODA,
+  getUndownloadedDisclosures,
 };

@@ -62,7 +62,6 @@ async function KAP_BIST_Company_updateCompanyCount(configData, newCount) {
   configData.KAP_BIST_COMPANY.company_count = newCount;
 }
 
-// KAP_BIST_DISCLOSURES
 async function KAP_BIST_Disclosures_updateLastControlTime(configData, newTime) {
   configData.KAP_BIST_DISCLOSURES.last_control_time = newTime;
 }
@@ -70,7 +69,9 @@ async function KAP_BIST_Disclosures_updateLastControlTime(configData, newTime) {
 async function KAP_BIST_Disclosures_updateLastDisclosureId(configData, newId) {
   configData.KAP_BIST_DISCLOSURES.last_disclosure_id = newId;
 }
-
+async function KAP_BIST_DISCLOSURES_DETAIL_DOWNLOADED_updateLastControlTime(configData,newTime) {
+  configData.KAP_BIST_DISCLOSURES_DETAIL_DOWNLOADED.last_control_time = newTime;
+}
 
 module.exports = {
   saveConfig,
@@ -83,4 +84,5 @@ module.exports = {
   KAP_BIST_Company_updateCompanyCount,
   KAP_BIST_Disclosures_updateLastControlTime,
   KAP_BIST_Disclosures_updateLastDisclosureId,
+  KAP_BIST_DISCLOSURES_DETAIL_DOWNLOADED_updateLastControlTime
 };
