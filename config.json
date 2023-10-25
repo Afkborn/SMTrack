@@ -6,27 +6,27 @@
     "bulten_url": "https://spk.gov.tr/spk-bultenleri/2023-yili-spk-bultenleri",
     "last_bulten_no": "2023-63",
     "last_bulten_date": "19 Ekim 2023 Perşembe",
-    "last_control_time": 1698093360415,
+    "last_control_time": 1698258131104,
     "last_bulten_link": "https://spk.gov.tr/data/653162a08f95db1488ba8322/2023-63 (PGD).pdf"
   },
   "CURRENCY": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 900000,
-    "last_control_time": 1698093360238
+    "last_control_time": 1698258130408
   },
   "BIST": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 900000,
-    "last_control_time": 1698093360238
+    "last_control_time": 1698258130409
   },
   "KAP_BIST_COMPANY": {
     "control_enabled": 1,
     "time_control_interval": 60000,
     "control_interval": 3600000,
-    "last_control_time": 1698090067287,
-    "company_count": 634,
+    "last_control_time": 1698258221255,
+    "company_count": 638,
     "base_url": "https://www.kap.org.tr/",
     "sirketler_url": "bist-sirketler"
   },
@@ -34,14 +34,16 @@
     "control_enabled": 1,
     "time_control_interval": 1000,
     "control_interval": 60000,
-    "last_control_time": 1698093624394,
-    "last_disclosure_id": "1e990617b3fdbd4e74f0b81057c050e999dd129d",
+    "last_control_time": 1698258956640,
+    "last_disclosure_id": "455d7aa2a8462566b83d70710a2053aa70be18c1",
     "base_url": "https://www.kap.org.tr/tr/api/disclosures"
   },
   "KAP_BIST_DISCLOSURES_DETAIL_DOWNLOADED": {
     "control_enabled": 1,
     "time_control_interval": 10000,
     "control_interval": 60000,
-    "last_control_time": 0
+    "last_control_time": 1698258963962,
+    "downloadPdf_url": "https://www.kap.org.tr/tr/BildirimPdf/",
+    "detail_url": "https://www.kap.org.tr/tr/BildirimPopup/"
   }
 }

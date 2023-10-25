@@ -16,8 +16,8 @@ const KAPMemberTypes = require("../constants/KAPMemberTypes.js");
 
 async function sendDisclosureToUsers(disclosure) {
   let href = "https://www.kap.org.tr/tr/Bildirim/" + disclosure.index;
-  let title = `${disclosure.companyName} ${disclosure.title}`;
-  sendMessageToAllTelegramUsers(strings.KAP_DISCLOSURE_NEW(title, href));
+  let title = `${disclosure.companyName} ${disclosure.title}`;  
+  // sendMessageToAllTelegramUsers(strings.KAP_DISCLOSURE_NEW(title, href));
 }
 
 async function handleNoStockCodes(disclosure, config) {
@@ -74,7 +74,6 @@ async function handleWithStockCodes(disclosure, config) {
             handleWithStockCodes
           );
           sendDisclosureToUsers(result);
-          // downloadDisclosureDetails(result);
         })
         .catch((error) => {
           if (error.code == 11000) {
@@ -96,14 +95,17 @@ async function handleWithStockCodes(disclosure, config) {
           if (error.code == 11000) {
             return;
           } else {
-            log("KAP açıklaması kaydedilemedi. " + error, getDisclosures);
+            log(
+              "KAP açıklaması kaydedilemedi. " + error,
+              getDisclosuresByIGS_ODA
+            );
           }
         });
       log(
         "KAP açıklaması kaydedilemedi. " +
           disclosure.basic.stockCodes +
           " şirketi bulunamadı.",
-        getDisclosures
+        getDisclosuresByIGS_ODA
       );
     }
   });
@@ -123,6 +125,10 @@ async function getDisclosuresByIGS_ODA(config) {
       let current_time_UNIX = new Date().getTime();
       if (current_time_UNIX > control_interval + last_control_time) {
         log("KAP Disclosures kontrolü geldi.", getDisclosuresByIGS_ODA);
+        KAP_BIST_Disclosures_updateLastControlTime(
+          config,
+          new Date().getTime()
+        );
         let fromDate = getToday_YYYYMMDD(); // bugünün tarihi
         let toDate = getToday_YYYYMMDD(); // bugünün tarihi
         // fromDate toDate aynı çünkü bugünün tarihindeki açıklamaları almak istiyoruz.
@@ -140,22 +146,25 @@ async function getDisclosuresByIGS_ODA(config) {
           toDate +
           "&memberTypes=" +
           KAPMemberTypes.BISTSirketleri;
-
-        axios.get(url).then((response) => {
-          let disclosures = response.data;
-          disclosures.forEach((disclosure) => {
-            let stockCodes = disclosure.basic.stockCodes;
-            if (stockCodes == "") {
-              handleNoStockCodes(disclosure, config);
-            } else {
-              handleWithStockCodes(disclosure, config);
-            }
+        axios
+          .get(url)
+          .then((response) => {
+            let disclosures = response.data;
+            disclosures.forEach((disclosure) => {
+              let stockCodes = disclosure.basic.stockCodes;
+              if (stockCodes == "") {
+                handleNoStockCodes(disclosure, config);
+              } else {
+                handleWithStockCodes(disclosure, config);
+              }
+            });
+          })
+          .catch((error) => {
+            log(
+              "KAP açıklamaları alınamadı. " + error,
+              getDisclosuresByIGS_ODA
+            );
           });
-          KAP_BIST_Disclosures_updateLastControlTime(
-            config,
-            new Date().getTime()
-          );
-        });
       }
     }, time_control_interval);
   }
@@ -173,7 +182,24 @@ async function getUndownloadedDisclosures() {
   });
 }
 
+// setDetailsDownloaded
+async function setDetailsDownloaded(disclosure, value) {
+  return new Promise((resolve, reject) => {
+    KAPDisclosure.updateOne(
+      { _id: disclosure._id },
+      { detailsDownloaded: value }
+    )
+      .then((result) => {
+        resolve(result);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+}
+
 module.exports = {
   getDisclosuresByIGS_ODA,
   getUndownloadedDisclosures,
+  setDetailsDownloaded,
 };
