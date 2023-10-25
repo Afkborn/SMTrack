@@ -17,7 +17,7 @@ const KAPMemberTypes = require("../constants/KAPMemberTypes.js");
 async function sendDisclosureToUsers(disclosure) {
   let href = "https://www.kap.org.tr/tr/Bildirim/" + disclosure.index;
   let title = `${disclosure.companyName} ${disclosure.title}`;  
-  // sendMessageToAllTelegramUsers(strings.KAP_DISCLOSURE_NEW(title, href));
+  sendMessageToAllTelegramUsers(strings.KAP_DISCLOSURE_NEW(title, href));
 }
 
 async function handleNoStockCodes(disclosure, config) {

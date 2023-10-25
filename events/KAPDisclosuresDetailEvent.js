@@ -5,12 +5,12 @@ const {
 const { downloadFile } = require("../common/file.js");
 const axios = require("axios");
 const cheerio = require("cheerio");
-
 const {
   getUndownloadedDisclosures,
   setDetailsDownloaded,
 } = require("./KAPDisclosuresEvent.js");
 require("dotenv").config();
+
 /**
  * KAP tarafından yayınlanan açıklamaların detay bilgilerini ve eklerini indirmeye yarayan fonksiyon. Bu işlemi KAP'dan açıklama çekildikten sonra düzneli olarak kontrol eder ve senkron bir şekilde indirir.
  * @param {object} config - Config.js içerisindeki KAP_BIST_DISCLOSURES_DETAIL_DOWNLOADED değişkeni
@@ -54,6 +54,7 @@ async function syncDisclosuresDetail(config) {
   }
 }
 
+
 async function downloadDisclosureDetail(config, disclosure) {
   return new Promise(async (resolve, reject) => {
     let fileName = disclosure.index + ".pdf";
@@ -73,7 +74,6 @@ async function downloadDisclosureDetail(config, disclosure) {
       let $ = cheerio.load(response.data);
       let attachments = [];
       let modalDiv = $("div.modal-attachments");
-      // modalDiv altında target değeri _blank olan bütün <a> taglerinin href'ini attachments'e ekle.
       modalDiv.find("a[target='_blank']").each((i, elem) => {
         attachments.push($(elem).attr("href"));
       });

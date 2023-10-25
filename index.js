@@ -39,7 +39,7 @@ let config;
   getDisclosuresByIGS_ODA(config);
   syncDisclosuresDetail(config);
 })();
-
+ 
 bot.command("kayit", (ctx) => {
   const msg = ctx.update.message;
   getTelegramUser(msg.from.id).then((user) => {
@@ -59,7 +59,7 @@ bot.command("kayit", (ctx) => {
         .catch((error) => {
           console.log(error);
           ctx.reply(strings.AUTH_FAIL);
-        });
+        }); 
     } else {
       ctx.reply(
         strings.ALREADY_AUTH(
